@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 
 st.set_page_config(layout="centered")
-st.title('Historical Weather Dataset Calendar Heatmap')
+st.title('Historical Weather Dataset Calendar Heatmap Generator')
 
 @st.cache_data
 def getBboxFromCity(cityName):
