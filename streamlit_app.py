@@ -327,7 +327,7 @@ def renderHeatmap(finalDf, titleStr, metricName, isDiffMode, yearForPlot):
 years = list(range(1950, 2027))
 years.sort(reverse=True)
 
-tab1 = st.tabs(["Historical Data"])
+tab1 = st.tabs(["Historical Data"])[0]
 
 with tab1:
     mode = st.selectbox("Mode", ["Single Station", "Single Station (Two Years)", "Two Stations"], key="histMode")
