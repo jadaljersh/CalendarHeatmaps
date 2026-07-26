@@ -327,9 +327,8 @@ def renderHeatmap(finalDf, titleStr, metricName, isDiffMode, yearForPlot):
 years = list(range(1950, 2027))
 years.sort(reverse=True)
 
-tab1, tab2 = st.tabs(["Historical Data", "Climate Normals"])
+tab1 = st.tabs(["Historical Data"])
 
-# === TAB 1: HISTORICAL ===
 with tab1:
     mode = st.selectbox("Mode", ["Single Station", "Single Station (Two Years)", "Two Stations"], key="histMode")
     metric = st.selectbox("Metric", [
@@ -405,54 +404,3 @@ with tab1:
                 
                 if not finalDf.empty:
                     renderHeatmap(finalDf, titleStr, metric, isDiff, year1)
-
-with tab2:
-    modeClim = st.selectbox("Mode", ["Single Station", "Two Stations"], key="climMode")
-    metricClim = st.selectbox("Metric", [
-        "Maximum temperature",
-        "Minimum temperature",
-        "Average Temperature"
-    ], key="climMetric")
-    
-    st.markdown("---")
-    
-    sidClim1 = renderStationSearch("clim1", "Primary Station")
-    
-    sidClim2 = None
-    if modeClim == "Two Stations":
-        st.markdown("---")
-        sidClim2 = renderStationSearch("clim2", "Comparison Station")
-        
-    st.markdown("---")
-    
-    if st.button('Generate Normals Calendar', type='primary'):
-        if not sidClim1:
-            st.error("Please select a Primary Station.")
-        elif modeClim == "Two Stations" and not sidClim2:
-            st.error("Please select a Comparison Station.")
-        else:
-            with st.spinner('Fetching Climate Normals...'):
-                displayYear = 2020
-                df1, name1 = fetchNoaaData(sidClim1, displayYear, metricClim, isClimate=True)
-                
-                finalDf = pd.DataFrame()
-                titleStr = ""
-                isDiff = False
-                
-                if modeClim == "Single Station":
-                    if df1.empty: st.error(f"No normals found for {name1}.")
-                    else:
-                        finalDf = df1
-                        titleStr = f"{name1}\n{metricClim} (1991-2020 Normals)"
-                elif modeClim == "Two Stations":
-                    df2, name2 = fetchNoaaData(sidClim2, displayYear, metricClim, isClimate=True)
-                    if df1.empty or df2.empty: st.error("Normals missing.")
-                    else:
-                        merged = pd.merge(df1, df2, on='DATE', suffixes=('_1', '_2'), how='outer')
-                        merged['VAL'] = merged['VAL_1'] - merged['VAL_2']
-                        finalDf = merged[['DATE', 'VAL']]
-                        titleStr = f"{name1} vs {name2}\n{metricClim} (Normals)"
-                        isDiff = True
-                        
-                if not finalDf.empty:
-                    renderHeatmap(finalDf, titleStr, metricClim, isDiff, displayYear)
